@@ -16,6 +16,8 @@ type
     procedure FormCreate(Sender: TObject);
     procedure StringGrid1SelectCell(Sender: TObject; ACol, ARow: Integer;
       var CanSelect: Boolean);
+    procedure StringGrid1DrawCell(Sender: TObject; ACol, ARow: Integer;
+      Rect: TRect; State: TGridDrawState);
   private
     { Private declarations }
   public
@@ -115,15 +117,13 @@ var retPos: PosType;
   function GameOver:boolean;
   var n:integer;
   begin
-      GameOver:=false;
-      if not(EndGame(CROSS) or EndGame(NULL)) then
-      begin
-        for n:=0 to 8 do
-        begin
-          if pos[n] = EMPTY then exit;
-        end;
-        GameOver:=true;
-      end;
+  GameOver:=false;
+  if EndGame(CROSS) or EndGame(NULL) then GameOver:=true
+   else
+    begin
+      for n:=0 to 8 do if pos[n] = EMPTY then exit;
+      GameOver:=true;
+    end;
   end;
 
   procedure ShowPos(SG:TSTringGrid);
@@ -139,11 +139,11 @@ var retPos: PosType;
     SG.Cells[0,2]:=ch(6); SG.Cells[1,2]:=ch(7); SG.Cells[2,2]:=ch(8);
   end;
 
-  procedure ShowGameOver;
+  procedure ShowGameOver(res:integer);
   var n:integer;
   begin
     for n:=0 to 8 do pos[n]:=EMPTY;
-    ShowMessage('Game Over!!!');
+    ShowMessage('Game Over!!!'+IntToStr(res));
   end;
 
 procedure TForm1.ANewGameExecute(Sender: TObject);
@@ -154,6 +154,17 @@ end;
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   ShowPos(StringGrid1);
+end;
+
+procedure TForm1.StringGrid1DrawCell(Sender: TObject; ACol, ARow: Integer;
+  Rect: TRect; State: TGridDrawState);
+begin
+ if GameOver then
+   begin
+    ShowPos(StringGrid1);
+    ShowGameOver(1);
+    ShowPos(StringGrid1);
+   end;
 end;
 
 procedure TForm1.StringGrid1SelectCell(Sender: TObject; ACol, ARow: Integer;
@@ -176,18 +187,20 @@ var chtmp:integer;
       result:=-1;
     end;
 
+var tmp: integer;
+
 begin
   chtmp:=MatrixToLine(ACol,ARow);
   pos[chtmp] := CROSS;
   ShowPos(StringGrid1);
   if not GameOver then
   begin
-    Search(NULL,-2,2,0);
+    tmp:=Search(NULL,-2,2,0);
     pos:=retPos;
     ShowPos(StringGrid1);
   end else
         begin
-          ShowGameOver;
+          ShowGameOver(tmp);
           ShowPos(StringGrid1);
         end;
 end;

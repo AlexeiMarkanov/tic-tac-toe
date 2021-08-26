@@ -24,6 +24,7 @@ object Form1: TForm1
     RowCount = 3
     FixedRows = 0
     TabOrder = 0
+    OnDrawCell = StringGrid1DrawCell
     OnSelectCell = StringGrid1SelectCell
   end
   object ActionList1: TActionList
