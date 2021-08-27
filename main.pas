@@ -4,7 +4,8 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, System.Actions, Vcl.ActnList, Vcl.Grids;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, System.Actions, Vcl.ActnList, Vcl.Grids,
+  Vcl.StdActns, System.ImageList, Vcl.ImgList;
 
 type
   TForm1 = class(TForm)
@@ -12,6 +13,8 @@ type
     ActionList1: TActionList;
     ANewGame: TAction;
     AShowPos: TAction;
+    ImageList1: TImageList;
+    EditDelete1: TEditDelete;
     procedure ANewGameExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure StringGrid1SelectCell(Sender: TObject; ACol, ARow: Integer;
@@ -158,12 +161,16 @@ end;
 
 procedure TForm1.StringGrid1DrawCell(Sender: TObject; ACol, ARow: Integer;
   Rect: TRect; State: TGridDrawState);
+var Bitmap: TBitmap;
 begin
  if GameOver then
    begin
     ShowPos(StringGrid1);
     ShowGameOver(1);
     ShowPos(StringGrid1);
+    ImageList1.GetBitmap(0,Bitmap);
+    StringGrid1.Canvas.StretchDraw(Rect,Bitmap);
+
    end;
 end;
 
