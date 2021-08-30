@@ -209,23 +209,21 @@ var chtmp :integer;
 
 begin
   chtmp:=MatrixToLine(ACol,ARow);
-  if  not GameOver then
+  if (pos[chtmp]=EMPTY) then
   begin
-    if (pos[chtmp]=EMPTY) then
+    pos[chtmp] := CROSS;
+    ShowPos(StringGrid1);
+    if not GameOver then
     begin
-      pos[chtmp] := CROSS;
-      ShowPos(StringGrid1);
       tmp:=Search(NULL,-2,2,0);
       pos:=retPos;
-    end;
-    if GameOver then ShowGameOver(tmp);
-    ShowPos(StringGrid1);
-  end else
-          begin
-            ShowGameOver(tmp);
-            ShowPos(StringGrid1);
-          end;
-
+    end else
+        begin
+          ShowGameOver(3);
+        end;
+  end;
+  if GameOver then ShowGameOver(2);
+  ShowPos(StringGrid1);
 end;
 
 end.
