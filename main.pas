@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, System.Actions, Vcl.ActnList, Vcl.Grids,
-  Vcl.StdActns, System.ImageList, Vcl.ImgList;
+  Vcl.StdActns, System.ImageList, Vcl.ImgList, Vcl.ExtCtrls;
 
 type
   TForm1 = class(TForm)
@@ -15,6 +15,9 @@ type
     AShowPos: TAction;
     ImageList1: TImageList;
     EditDelete1: TEditDelete;
+    Image1: TImage;
+    Image2: TImage;
+    Image3: TImage;
     procedure ANewGameExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure StringGrid1SelectCell(Sender: TObject; ACol, ARow: Integer;
@@ -129,6 +132,25 @@ var retPos: PosType;
     end;
   end;
 
+{определяем номер ячейки по двум координатам}
+{избыточно и непрофессионально}
+  function MatrixToLine(Col,Row:integer):integer;
+  begin
+    if (Col=0) and (Row=0) then begin result:=0; exit; end;
+    if (Col=1) and (Row=0) then begin result:=1; exit; end;
+    if (Col=2) and (Row=0) then begin result:=2; exit; end;
+    if (Col=0) and (Row=1) then begin result:=3; exit; end;
+    if (Col=1) and (Row=1) then begin result:=4; exit; end;
+    if (Col=2) and (Row=1) then begin result:=5; exit; end;
+    if (Col=0) and (Row=2) then begin result:=6; exit; end;
+    if (Col=1) and (Row=2) then begin result:=7; exit; end;
+    if (Col=2) and (Row=2) then begin result:=8; exit; end;
+    result:=-1;
+  end;
+
+
+
+
   procedure ShowPos(SG:TSTringGrid);
       function Ch(n:integer):char;
       begin
@@ -145,8 +167,8 @@ var retPos: PosType;
   procedure ShowGameOver(res:integer);
   var n:integer;
   begin
-    for n:=0 to 8 do pos[n]:=EMPTY;
     ShowMessage('Game Over!!!'+IntToStr(res));
+    for n:=0 to 8 do pos[n]:=EMPTY;
   end;
 
 procedure TForm1.ANewGameExecute(Sender: TObject);
@@ -156,60 +178,54 @@ end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-  ShowPos(StringGrid1);
+//  ShowPos(StringGrid1);
 end;
 
 procedure TForm1.StringGrid1DrawCell(Sender: TObject; ACol, ARow: Integer;
   Rect: TRect; State: TGridDrawState);
-var Bitmap: TBitmap;
-begin
- if GameOver then
-   begin
-    ShowPos(StringGrid1);
-    ShowGameOver(1);
-    ShowPos(StringGrid1);
-    ImageList1.GetBitmap(0,Bitmap);
-    StringGrid1.Canvas.StretchDraw(Rect,Bitmap);
 
-   end;
+        {определяем картинку по номеру клетки}
+      function Pg(n:integer):TGraphic;
+      begin
+        if Pos[n]= CROSS then result:=Image1.Picture.Graphic
+          else if Pos[n]=NULL then result :=Image2.Picture.Graphic
+          else result :=Image3.Picture.Graphic;
+      end;
+
+begin
+// if GameOver then
+//   begin
+//    ShowPos(StringGrid1);
+//    ShowGameOver(1);
+//    ShowPos(StringGrid1);
+//   end;
+    StringGrid1.Canvas.StretchDraw(Rect,Pg(MatrixToLine(ACol,ARow)));
 end;
 
 procedure TForm1.StringGrid1SelectCell(Sender: TObject; ACol, ARow: Integer;
   var CanSelect: Boolean);
-var chtmp:integer;
-
-    {определяем номер ячейки по двум координатам}
-    {избыточно и непрофессионально}
-    function MatrixToLine(Col,Row:integer):integer;
-    begin
-      if (Col=0) and (Row=0) then begin result:=0; exit; end;
-      if (Col=1) and (Row=0) then begin result:=1; exit; end;
-      if (Col=2) and (Row=0) then begin result:=2; exit; end;
-      if (Col=0) and (Row=1) then begin result:=3; exit; end;
-      if (Col=1) and (Row=1) then begin result:=4; exit; end;
-      if (Col=2) and (Row=1) then begin result:=5; exit; end;
-      if (Col=0) and (Row=2) then begin result:=6; exit; end;
-      if (Col=1) and (Row=2) then begin result:=7; exit; end;
-      if (Col=2) and (Row=2) then begin result:=8; exit; end;
-      result:=-1;
-    end;
-
-var tmp: integer;
+var chtmp :integer;
+    tmp   : integer;
 
 begin
   chtmp:=MatrixToLine(ACol,ARow);
-  pos[chtmp] := CROSS;
-  ShowPos(StringGrid1);
-  if not GameOver then
+  if  not GameOver then
   begin
-    tmp:=Search(NULL,-2,2,0);
-    pos:=retPos;
+    if (pos[chtmp]=EMPTY) then
+    begin
+      pos[chtmp] := CROSS;
+      ShowPos(StringGrid1);
+      tmp:=Search(NULL,-2,2,0);
+      pos:=retPos;
+    end;
+    if GameOver then ShowGameOver(tmp);
     ShowPos(StringGrid1);
   end else
-        begin
-          ShowGameOver(tmp);
-          ShowPos(StringGrid1);
-        end;
+          begin
+            ShowGameOver(tmp);
+            ShowPos(StringGrid1);
+          end;
+
 end;
 
 end.
