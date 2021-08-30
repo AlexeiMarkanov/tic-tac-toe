@@ -154,8 +154,8 @@ var retPos: PosType;
   procedure ShowPos(SG:TSTringGrid);
       function Ch(n:integer):char;
       begin
-        if Pos[n]= CROSS then Ch:='*'
-          else if Pos[n]=NULL then Ch :='0'
+        if Pos[n]= CROSS then Ch:=' '
+          else if Pos[n]=NULL then Ch :=' '
           else Ch:=' ';
       end;
   begin
@@ -164,10 +164,10 @@ var retPos: PosType;
     SG.Cells[0,2]:=ch(6); SG.Cells[1,2]:=ch(7); SG.Cells[2,2]:=ch(8);
   end;
 
-  procedure ShowGameOver(res:integer);
+  procedure ShowGameOver(res:string);
   var n:integer;
   begin
-    ShowMessage('Game Over!!!'+IntToStr(res));
+    ShowMessage('Игра окончена, '+res+'!');
     for n:=0 to 8 do pos[n]:=EMPTY;
   end;
 
@@ -219,10 +219,10 @@ begin
       pos:=retPos;
     end else
         begin
-          ShowGameOver(3);
+          ShowGameOver('ничья');
         end;
   end;
-  if GameOver then ShowGameOver(2);
+  if GameOver then ShowGameOver('Вы проиграли');
   ShowPos(StringGrid1);
 end;
 
